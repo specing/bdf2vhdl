@@ -1,5 +1,5 @@
 #
-# @file Makefile @brief bdf2c - converts bdf font files into C files
+# @file Makefile @brief bdf2vhdl - converts bdf font files into VHDL files
 #
 # Copyright (c) 2009, 2010 by Lutz Sammer.  All Rights Reserved.
 #
@@ -24,22 +24,22 @@ LIBS    =
 CFLAGS  = -Os -Werror -W -Wall
 LDFLAGS =
 
-OBJS    = bdf2c.o
+OBJS    = bdf2vhdl.o
 HDRS    =
 FILES   = Makefile AGPL-3.0.txt README.txt Changelog.txt
 
-all: bdf2c
+all: bdf2vhdl
 
 $(OBJS): $(HDRS) Makefile
 
-bdf2c: $(OBJS)
+bdf2vhdl: $(OBJS)
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $^ $(LIBS)
 
 #----------------------------------------------------------------------------
 # Developer tools
 
-doc:	$(SRCS) $(HDRS) bdf2c.doxyfile
-	(cat bdf2c.doxyfile; \
+doc:	$(SRCS) $(HDRS) bdf2vhdl.doxyfile
+	(cat bdf2vhdl.doxyfile; \
 	echo 'PROJECT_NUMBER=${VERSION} $(if $(GIT_REV), (GIT-$(GIT_REV)))') \
 	| doxygen -
 
@@ -52,15 +52,15 @@ clean:
 	-rm *.o *~
 
 clobber:	clean
-	-rm bdf2c
+	-rm bdf2vhdl
 
 dist:
-	tar cjCf .. bdf2c-`date +%F-%H`.tar.bz2 \
-		$(addprefix bdf2c/, $(FILES) $(OBJS:.o=.c))
+	tar cjCf .. bdf2vhdl-`date +%F-%H`.tar.bz2 \
+		$(addprefix bdf2vhdl/, $(FILES) $(OBJS:.o=.c))
 
 install:
-	strip --strip-unneeded -R .comment bdf2c
-	install -s bdf2c /usr/local/bin/
+	strip --strip-unneeded -R .comment bdf2vhdl
+	install -s bdf2vhdl /usr/local/bin/
 
 commit:
 	git commit $(OBJS:.o=.c) $(HDRS) $(FILES)

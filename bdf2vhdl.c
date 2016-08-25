@@ -1,5 +1,5 @@
 ///
-/// @file bdf2c.c       @brief BDF Font to C source convertor
+/// @file bdf2vhdl.c       @brief BDF Font to C source convertor
 ///
 /// Copyright (c) 2009, 2010 by Lutz Sammer.  All Rights Reserved.
 ///
@@ -22,7 +22,7 @@
 
 ///
 /// @mainpage
-///     bdf2c - converts bdf font files into C include files.
+///     bdf2vhdl - converts bdf font files into C include files.
 ///
 ///     The Bitmap Distribution Format (BDF) is a file format for
 ///     storing bitmap fonts. The content is presented as a text file
@@ -137,7 +137,7 @@ void Header(FILE * out, const char *name, int width, int height, int chars)
         "use ieee.std_logic_1164.all;\n"
         );
     fprintf (out,
-        "-- Created from bdf2c Version %s, (c) 2009, 2010 by Lutz Sammer\n"
+        "-- Created from bdf2vhdl Version %s, (c) 2009, 2010 by Lutz Sammer\n"
         "-- Modified for VHDL by Fedja Beader\n"
         "-- License AGPLv3: GNU Affero General Public License version 3\n"
         , VERSION);
@@ -640,7 +640,7 @@ void ReadBdf(FILE * bdf, FILE * out, const char *name)
 ///
 void PrintVersion(void)
 {
-    printf("bdf2c Version %s, (c) 2009, 2010 by Lutz Sammer\n"
+    printf("bdf2vhdl Version %s, (c) 2009, 2010 by Lutz Sammer & Fedja Beader\n"
         "\tLicense AGPLv3: GNU Affero General Public License version 3\n",
         VERSION);
 }
@@ -650,7 +650,7 @@ void PrintVersion(void)
 ///
 void PrintUsage(void)
 {
-    printf("Usage: bdf2c [OPTIONs]\n"
+    printf("Usage: bdf2vhdl [OPTIONs]\n"
         "\t-h or -?\tPrints this short page on stdout\n"
         "\t-b\tRead bdf file from stdin, write to stdout\n"
         "\t-c\tCreate font header on stdout\n"
@@ -661,7 +661,7 @@ void PrintUsage(void)
 }
 
 ///
-/// Main test program for bdf2c.
+/// Main test program for bdf2vhdl.
 ///
 ///
 /// @param argc  number of arguments
