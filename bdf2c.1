@@ -1,31 +1,31 @@
 .\"
-.\"	bdf2c.1		 	bdf2c - bdf to c convertor man page
+.\" bdf2vhdl.1    bdf2vhdl - bdf to VHDL convertor man page
 .\"
-.\"	Copyright (c) 2009, 2010 by Lutz Sammer.  All Rights Reserved.
+.\" Copyright (c) 2009, 2010 by Lutz Sammer.  All Rights Reserved.
 .\"
-.\"	Contributor(s):
+.\" Contributor(s): Fedja Beader
 .\"
-.\"	License: AGPLv3
+.\" License: AGPLv3
 .\"
-.\"	This program is free software: you can redistribute it and/or modify
-.\"	it under the terms of the GNU Affero General Public License as
-.\"	published by the Free Software Foundation, either version 3 of the
-.\"	License.
+.\" This program is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU Affero General Public License as
+.\" published by the Free Software Foundation, either version 3 of the
+.\" License.
 .\"
-.\"	This program is distributed in the hope that it will be useful,
-.\"	but WITHOUT ANY WARRANTY; without even the implied warranty of
-.\"	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-.\"	GNU Affero General Public License for more details.
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU Affero General Public License for more details.
 .\"
-.\"	$Id$
+.\" $Id$
 .\" ------------------------------------------------------------------------
-.TH "bdf2c" 1 "2010-24-10" "1" "bdf2c Manual"
+.TH "bdf2vhdl" 1 "2010-24-10" "1" "bdf2vhdl Manual"
 
 .SH NAME
-bdf2c \- converts bdf font files into C include files
+bdf2vhdl \- converts bdf font files into C include files
 
 .SH SYNOPSIS
-.B bdf2c
+.B bdf2vhdl
 .BI [\-?|\-h]
 .BI [\-b]
 .BI [\-c]
@@ -35,7 +35,7 @@ bdf2c \- converts bdf font files into C include files
 
 .SH DESCRIPTION
 
-bdf2c creates C source and C header file from bdf font files.  Which can be
+bdf2vhdl creates VHDL source and C header file from bdf font files.  Which can be
 used to embed fonts into the executable.
 
 .SH OPTIONS
@@ -54,7 +54,7 @@ Creates C header file 'file'.
 Read and convert bdf font from stdin to stdout.
 .TP
 .BI \-n \ name
-Name of the C font structure. 'name' should contain only valid identifier
+Name of the VHDL font package. 'name' should contain only valid identifier
 characters.  f.e. font9x15b
 .TP
 .BI \-O

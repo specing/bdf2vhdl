@@ -1,8 +1,8 @@
-@file README		@brief	BDF Font to C source convertor readme
+@file README @brief BDF Font to VHDL source convertor readme
 
 Copyright (c) 2009, 2010 by Lutz Sammer.  All Rights Reserved.
 
-Contributor(s):
+Contributor(s): Fedja Beader
 
 License: AGPLv3
 
@@ -22,24 +22,24 @@ My version of BDF fonts convertor to C includes, which can be used to
 embed fonts into the executable.
 
 Usage:
-	./bdf2c -c
+    ./bdf2vhdl -c
 
-	Print #defines for font files to stdout.
+    Print #defines for font files to stdout.
 
-	./bdf2c -C font.h
+    ./bdf2vhdl -C font.h
 
-	Create font.h, which contains #defines for fonts.
+    Create font.h, which contains #defines for fonts.
 
-	./bdf2c -b < font.bdf > font.c
+    ./bdf2vhdl -b < font.bdf > font.vhd
 
-	Create font.c which contains the converted bdf font.
+    Create font.vhd which contains the converted bdf font.
 
-The C file contains:
+The VHDL file contains: (well some of this...)
 
-	Bitmap data for the characters.
-	Character width table for proportional font
-	Character codes table for utf-8 font
+    Bitmap data for the characters.
+    Character width table for proportional font
+    Character codes table for utf-8 font
 
 TODO:
-	Proportional fonts (f.e. generated from ttf2bdf) aren't yet supported.
-	Example how to use the created font file.
+    Proportional fonts (f.e. generated from ttf2bdf) aren't yet supported.
+    Example how to use the created font file.
