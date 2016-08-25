@@ -3,7 +3,7 @@
 ///
 /// Copyright (c) 2009, 2010 by Lutz Sammer.  All Rights Reserved.
 ///
-/// Contributor(s):
+/// Contributor(s): Fedja Beader
 ///
 /// License: AGPLv3
 ///
@@ -78,6 +78,7 @@
 #include <string.h>
 #include <limits.h>
 #include <errno.h>
+#include <ctype.h>
 
 #define VERSION "4" ///< version of this application
 
@@ -123,19 +124,56 @@ void CreateFontHeaderFile(FILE * out)
 ///
 /// Print header for c file.
 ///
-/// @param out   file stream for output
-/// @param name  font variable name in C source file
+/// @param out     file stream for output
+/// @param name    font variable name in C source file
+/// @param width   character width of font
+/// @param height  character height of font
+/// @param chars   number of characters in font
 ///
-void Header(FILE * out, const char *name)
+void Header(FILE * out, const char *name, int width, int height, int chars)
 {
-    fprintf(out,
-        "// Created from bdf2c Version %s, (c) 2009, 2010 by Lutz Sammer\n"
-        "//\tLicense AGPLv3: GNU Affero General Public License version 3\n"
-        "\n#include \"font.h\"\n\n", VERSION);
+    fprintf (out,
+        "library ieee;\n"
+        "use ieee.std_logic_1164.all;\n"
+        );
+    fprintf (out,
+        "-- Created from bdf2c Version %s, (c) 2009, 2010 by Lutz Sammer\n"
+        "-- Modified for VHDL by Fedja Beader\n"
+        "-- License AGPLv3: GNU Affero General Public License version 3\n"
+        , VERSION);
 
     fprintf(out,
-        "\t/// character bitmap for each encoding\n"
-        "static const unsigned char __%s_bitmap__[] = {\n", name);
+        "-- character bitmap for each encoding\n"
+        "package %s is\n"
+        , name);
+
+
+//    fprintf (out,
+//        "    -- bitmap font structure\n"
+//        "    -- const struct bitmap_font %s = {\n",
+//        name);
+    fprintf (out,
+        "    constant character_width  : positive := %d;\n"
+        "    constant character_height : positive := %d;\n"
+        "\n"
+        "    constant number_of_characters : natural  := %d;\n"
+        "\n"
+        , width, height, chars);
+
+    fprintf (out,
+        "    subtype pixel_row is std_logic_vector (0 to character_width - 1);\n"
+        "\n"
+        "    type pixel_rows is\n"
+        "      array (0 to character_height - 1) of\n"
+        "      pixel_row;\n"
+        "\n"
+        );
+
+//    fprintf(out, "\t.Chars = %d,\n", chars);
+//    fprintf(out, "\t.Widths = __%s_widths__,\n", name);
+//    fprintf(out, "\t.Index = __%s_index__,\n", name);
+//    fprintf(out, "\t.Bitmap = __%s_bitmap__,\n", name);
+//    fprintf(out, "};\n\n");
 }
 
 ///
@@ -189,9 +227,11 @@ void EncodingTable(FILE * out, const char *name,
 /// @param height  character height of font
 /// @param chars   number of characters in font
 ///
-void Footer(FILE * out, const char *name, int width, int height, int chars)
+void Footer(FILE * out, const char *name)
 {
-    fprintf(out, "};\n\n");
+    fprintf(out, "end package %s;\n", name);
+
+/* Note: some of the below info has been moved to header instead
     fprintf(out,
         "\t/// bitmap font structure\n" "const struct bitmap_font %s = {\n",
         name);
@@ -201,6 +241,7 @@ void Footer(FILE * out, const char *name, int width, int height, int chars)
     fprintf(out, "\t.Index = __%s_index__,\n", name);
     fprintf(out, "\t.Bitmap = __%s_bitmap__,\n", name);
     fprintf(out, "};\n\n");
+*/
 }
 
 ///
@@ -213,58 +254,31 @@ void Footer(FILE * out, const char *name, int width, int height, int chars)
 ///
 void DumpCharacter(FILE * out, unsigned char *bitmap, int width, int height)
 {
-    int x;
-    int y;
-    int c;
+    int x, y;
 
     for (y = 0; y < height; ++y) {
-        fputc('\t', out);
+        unsigned mask = 0x80;
+
+        fputs("      \"", out); // padding for .vhd source indents + start of vector
         for (x = 0; x < width; x += 8) {
-            c = bitmap[y * ((width + 7) / 8) + x / 8];
+            int c = bitmap[y * ((width + 7) / 8) + x / 8];
             //printf("%d = %d\n", y * ((width+7)/8) + x/8, c);
-            if (c & 0x80) {
-                fputc('X', out);
-            } else {
-                fputc('_', out);
+            while (mask > 0) {
+                if (c & mask) {
+                    fputc('1', out);
+                } else {
+                    fputc('0', out);
+                }
+
+                mask = mask / 2;
             }
-            if (c & 0x40) {
-                fputc('X', out);
-            } else {
-                fputc('_', out);
-            }
-            if (c & 0x20) {
-                fputc('X', out);
-            } else {
-                fputc('_', out);
-            }
-            if (c & 0x10) {
-                fputc('X', out);
-            } else {
-                fputc('_', out);
-            }
-            if (c & 0x08) {
-                fputc('X', out);
-            } else {
-                fputc('_', out);
-            }
-            if (c & 0x04) {
-                fputc('X', out);
-            } else {
-                fputc('_', out);
-            }
-            if (c & 0x02) {
-                fputc('X', out);
-            } else {
-                fputc('_', out);
-            }
-            if (c & 0x01) {
-                fputc('X', out);
-            } else {
-                fputc('_', out);
-            }
-            fputc(',', out);
         }
-        fputc('\n', out);
+        // end of vector
+        fputc ('"', out);
+
+        if (y != height - 1) // not at end of vectors
+            fputc (',', out);
+        fputc ('\n', out);
     }
 }
 
@@ -462,7 +476,7 @@ void ReadBdf(FILE * bdf, FILE * out, const char *name)
         exit(-1);
     }
 
-    Header(out, name);
+    Header(out, name, fontboundingbox_width, fontboundingbox_height, chars);
 
     scanline = -1;
     n = 0;
@@ -500,9 +514,40 @@ void ReadBdf(FILE * bdf, FILE * out, const char *name)
             p = strtok(NULL, " \t\n\r");
             bby = atoi(p);
         } else if (!strcasecmp(s, "BITMAP")) {
-            fprintf(out, "// %3d $%02x '%s'\n", encoding, encoding, charname);
-            fprintf(out, "//\twidth %d, bbx %d, bby %d, bbw %d, bbh %d\n",
+            fprintf(out, "    -- %3d $%02x '%s'\n", encoding, encoding, charname);
+            fprintf(out, "    -- width %d, bbx %d, bby %d, bbw %d, bbh %d\n",
                 width, bbx, bby, bbw, bbh);
+
+            // encode upper case letter so that they do not interfere with lowercase
+            // identifiers, such as glyph_for_a and glyph_for_A
+            // The later thus becomes glyph_for_uA, where the u stands for 'upper'
+            // (for now)
+            #define vhd_charname_len 100
+            char vhd_charname[vhd_charname_len];
+
+            // Copy encoding number first, rest second
+            sprintf(vhd_charname, "%02x_%s", encoding, charname);
+
+            /*
+            int src_index = 0;
+            int dest_index = 0;
+            for (src_index = 0; '\0' != charname [src_index]; ++src_index)
+            {
+                char ch = charname [src_index];
+                if (isupper (ch)) {
+                    vhd_charname [dest_index++] = 'u';
+                    if (dest_index == vhd_charname_len)
+                        exit(50);
+                }
+                vhd_charname [dest_index++] = ch;
+                if (dest_index == vhd_charname_len)
+                    exit(50);
+            }
+            vhd_charname [dest_index] = '\0';
+            */
+
+
+            fprintf(out, "    constant glyph_for_%s : pixel_rows := (\n", vhd_charname);
 
             if (n == chars) {
                 fprintf(stderr, "Too many bitmaps for characters\n");
@@ -548,6 +593,7 @@ void ReadBdf(FILE * bdf, FILE * out, const char *name)
             }
             DumpCharacter(out, bitmap, fontboundingbox_width,
                 fontboundingbox_height);
+            fprintf (out, "    );\n");
             scanline = -1;
             width = INT_MIN;
         } else {
@@ -577,13 +623,14 @@ void ReadBdf(FILE * bdf, FILE * out, const char *name)
     }
 
     // Output width table for proportional font.
-    WidthTable(out, name, width_table, chars);
+//    WidthTable(out, name, width_table, chars);
     // FIXME: Output offset table for proportional font.
     // OffsetTable(out, name, offset_table, chars);
     // Output encoding table for utf-8 support
-    EncodingTable(out, name, encoding_table, chars);
+    //
+//    EncodingTable(out, name, encoding_table, chars);
 
-    Footer(out, name, fontboundingbox_width, fontboundingbox_height, chars);
+    Footer(out, name);
 }
 
 //////////////////////////////////////////////////////////////////////////////
